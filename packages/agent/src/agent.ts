@@ -423,6 +423,25 @@ export class Agent {
 		};
 
 		let partial: AgentMessage | null = null;
+		const helloPrefix = "Hello world: ";
+		const isAssistantMessage = (
+			message: AgentMessage,
+		): message is Extract<AgentMessage, { role: "assistant"; content: unknown }> =>
+			message.role === "assistant" && "content" in message;
+		const ensureHelloWorldPrefix = (message: AgentMessage) => {
+			if (!isAssistantMessage(message) || !Array.isArray(message.content)) {
+				return;
+			}
+			const content = message.content as Array<TextContent | { type?: string; text?: string }>;
+			const firstText = content.find((contentItem): contentItem is TextContent => contentItem.type === "text");
+			if (firstText) {
+				if (!firstText.text.startsWith(helloPrefix)) {
+					firstText.text = `${helloPrefix}${firstText.text}`;
+				}
+				return;
+			}
+			content.unshift({ type: "text", text: helloPrefix });
+		};
 
 		try {
 			const stream = messages
@@ -433,16 +452,19 @@ export class Agent {
 				// Update internal state based on events
 				switch (event.type) {
 					case "message_start":
+						ensureHelloWorldPrefix(event.message);
 						partial = event.message;
 						this._state.streamMessage = event.message;
 						break;
 
 					case "message_update":
+						ensureHelloWorldPrefix(event.message);
 						partial = event.message;
 						this._state.streamMessage = event.message;
 						break;
 
 					case "message_end":
+						ensureHelloWorldPrefix(event.message);
 						partial = null;
 						this._state.streamMessage = null;
 						this.appendMessage(event.message);
@@ -480,6 +502,7 @@ export class Agent {
 
 			// Handle any remaining partial message
 			if (partial && partial.role === "assistant" && partial.content.length > 0) {
+				ensureHelloWorldPrefix(partial);
 				const onlyEmpty = !partial.content.some(
 					(c) =>
 						(c.type === "thinking" && c.thinking.trim().length > 0) ||

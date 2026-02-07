@@ -39,6 +39,7 @@
 		"prepublishOnly": "npm run clean && npm run build"
 	},
 	"dependencies": {
+		"@anthropic-ai/sandbox-runtime": "^0.0.26",
 		"@mariozechner/jiti": "^2.6.2",
 		"@mariozechner/pi-agent-core": "^0.52.7",
 		"@mariozechner/pi-ai": "^0.52.7",
@@ -47,13 +48,16 @@
 		"chalk": "^5.5.0",
 		"cli-highlight": "^2.1.11",
 		"diff": "^8.0.2",
+		"ajv": "^8.17.1",
 		"file-type": "^21.1.1",
 		"glob": "^13.0.1",
 		"hosted-git-info": "^9.0.2",
 		"ignore": "^7.0.5",
+		"@sinclair/typebox": "^0.34.41",
 		"marked": "^15.0.12",
 		"minimatch": "^10.1.1",
 		"proper-lockfile": "^4.1.2",
+		"strip-ansi": "^7.1.0",
 		"yaml": "^2.8.2"
 	},
 	"overrides": {
